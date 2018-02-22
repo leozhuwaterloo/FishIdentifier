@@ -1,0 +1,372 @@
+{
+    "2": {
+        "genusname": "Oreochromis",
+        "speciesname": "niloticus"
+    },
+    "3": {
+        "genusname": "Oreochromis",
+        "speciesname": "mossambicus"
+    },
+    "4": {
+        "genusname": "Engraulis",
+        "speciesname": "ringens"
+    },
+    "5": {
+        "genusname": "Orthopristis",
+        "speciesname": "chrysoptera"
+    },
+    "6": {
+        "genusname": "Coryphaena",
+        "speciesname": "hippurus"
+    },
+    "7": {
+        "genusname": "Coryphaena",
+        "speciesname": "equiselis"
+    },
+    "9": {
+        "genusname": "Abalistes",
+        "speciesname": "stellaris"
+    },
+    "10": {
+        "genusname": "Alectis",
+        "speciesname": "indica"
+    },
+    "12": {
+        "genusname": "Cephalopholis",
+        "speciesname": "cruentata"
+    },
+    "14": {
+        "genusname": "Epinephelus",
+        "speciesname": "adscensionis"
+    },
+    "15": {
+        "genusname": "Epinephelus",
+        "speciesname": "guttatus"
+    },
+    "16": {
+        "genusname": "Epinephelus",
+        "speciesname": "itajara"
+    },
+    "17": {
+        "genusname": "Epinephelus",
+        "speciesname": "morio"
+    },
+    "18": {
+        "genusname": "Epinephelus",
+        "speciesname": "striatus"
+    },
+    "19": {
+        "genusname": "Balistes",
+        "speciesname": "vetula"
+    },
+    "20": {
+        "genusname": "Argentina",
+        "speciesname": "sphyraena"
+    },
+    "21": {
+        "genusname": "Benthosema",
+        "speciesname": "glaciale"
+    },
+    "22": {
+        "genusname": "Callionymus",
+        "speciesname": "reticulatus"
+    },
+    "23": {
+        "genusname": "Callionymus",
+        "speciesname": "lyra"
+    },
+    "24": {
+        "genusname": "Clupea",
+        "speciesname": "harengus"
+    },
+    "25": {
+        "genusname": "Gadiculus",
+        "speciesname": "thori"
+    },
+    "26": {
+        "genusname": "Glyptocephalus",
+        "speciesname": "cynoglossus"
+    },
+    "27": {
+        "genusname": "Lepidorhombus",
+        "speciesname": "boscii"
+    },
+    "28": {
+        "genusname": "Lepidorhombus",
+        "speciesname": "whiffiagonis"
+    },
+    "29": {
+        "genusname": "Merlangius",
+        "speciesname": "merlangus"
+    },
+    "30": {
+        "genusname": "Merluccius",
+        "speciesname": "merluccius"
+    },
+    "31": {
+        "genusname": "Micromesistius",
+        "speciesname": "poutassou"
+    },
+    "32": {
+        "genusname": "Microchirus",
+        "speciesname": "variegatus"
+    },
+    "33": {
+        "genusname": "Molva",
+        "speciesname": "molva"
+    },
+    "34": {
+        "genusname": "Pollachius",
+        "speciesname": "pollachius"
+    },
+    "35": {
+        "genusname": "Anguilla",
+        "speciesname": "anguilla"
+    },
+    "36": {
+        "genusname": "Agonus",
+        "speciesname": "cataphractus"
+    },
+    "37": {
+        "genusname": "Ammodytes",
+        "speciesname": "marinus"
+    },
+    "38": {
+        "genusname": "Ammodytes",
+        "speciesname": "tobianus"
+    },
+    "39": {
+        "genusname": "Aphia",
+        "speciesname": "minuta"
+    },
+    "40": {
+        "genusname": "Argyropelecus",
+        "speciesname": "affinis"
+    },
+    "41": {
+        "genusname": "Arnoglossus",
+        "speciesname": "laterna"
+    },
+    "42": {
+        "genusname": "Arnoglossus",
+        "speciesname": "imperialis"
+    },
+    "43": {
+        "genusname": "Arnoglossus",
+        "speciesname": "thori"
+    },
+    "44": {
+        "genusname": "Chelidonichthys",
+        "speciesname": "cuculus"
+    },
+    "45": {
+        "genusname": "Atherina",
+        "speciesname": "presbyter"
+    },
+    "46": {
+        "genusname": "Melanolagus",
+        "speciesname": "bericoides"
+    },
+    "47": {
+        "genusname": "Belone",
+        "speciesname": "belone"
+    },
+    "48": {
+        "genusname": "Parablennius",
+        "speciesname": "gattorugine"
+    },
+    "49": {
+        "genusname": "Blennius",
+        "speciesname": "ocellaris"
+    },
+    "51": {
+        "genusname": "Brosme",
+        "speciesname": "brosme"
+    },
+    "52": {
+        "genusname": "Buenia",
+        "speciesname": "jeffreysii"
+    },
+    "53": {
+        "genusname": "Buglossidium",
+        "speciesname": "luteum"
+    },
+    "54": {
+        "genusname": "Capros",
+        "speciesname": "aper"
+    },
+    "55": {
+        "genusname": "Centrolabrus",
+        "speciesname": "exoletus"
+    },
+    "56": {
+        "genusname": "Cepola",
+        "speciesname": "macrophthalma"
+    },
+    "57": {
+        "genusname": "Chirolophis",
+        "speciesname": "ascanii"
+    },
+    "58": {
+        "genusname": "Coris",
+        "speciesname": "julis"
+    },
+    "59": {
+        "genusname": "Symphodus",
+        "speciesname": "melops"
+    },
+    "60": {
+        "genusname": "Crystallogobius",
+        "speciesname": "linearis"
+    },
+    "61": {
+        "genusname": "Ctenolabrus",
+        "speciesname": "rupestris"
+    },
+    "62": {
+        "genusname": "Cyclopterus",
+        "speciesname": "lumpus"
+    },
+    "63": {
+        "genusname": "Dicentrarchus",
+        "speciesname": "labrax"
+    },
+    "64": {
+        "genusname": "Diplecogaster",
+        "speciesname": "bimaculata"
+    },
+    "65": {
+        "genusname": "Echiodon",
+        "speciesname": "drummondii"
+    },
+    "66": {
+        "genusname": "Engraulis",
+        "speciesname": "encrasicolus"
+    },
+    "67": {
+        "genusname": "Entelurus",
+        "speciesname": "aequoreus"
+    },
+    "68": {
+        "genusname": "Eutrigla",
+        "speciesname": "gurnardus"
+    },
+    "69": {
+        "genusname": "Gadus",
+        "speciesname": "morhua"
+    },
+    "71": {
+        "genusname": "Caranx",
+        "speciesname": "hippos"
+    },
+    "72": {
+        "genusname": "Gobius",
+        "speciesname": "niger"
+    },
+    "73": {
+        "genusname": "Gobius",
+        "speciesname": "paganellus"
+    },
+    "74": {
+        "genusname": "Gobiusculus",
+        "speciesname": "flavescens"
+    },
+    "76": {
+        "genusname": "Helicolenus",
+        "speciesname": "dactylopterus"
+    },
+    "77": {
+        "genusname": "Istiophorus",
+        "speciesname": "platypterus"
+    },
+    "78": {
+        "genusname": "Istiophorus",
+        "speciesname": "albicans"
+    },
+    "79": {
+        "genusname": "Ctenopharyngodon",
+        "speciesname": "idella"
+    },
+    "80": {
+        "genusname": "Chanos",
+        "speciesname": "chanos"
+    },
+    "81": {
+        "genusname": "Aphareus",
+        "speciesname": "furca"
+    },
+    "82": {
+        "genusname": "Labeo",
+        "speciesname": "rohita"
+    },
+    "83": {
+        "genusname": "Aphareus",
+        "speciesname": "rutilans"
+    },
+    "84": {
+        "genusname": "Aprion",
+        "speciesname": "virescens"
+    },
+    "85": {
+        "genusname": "Apsilus",
+        "speciesname": "dentatus"
+    },
+    "86": {
+        "genusname": "Apsilus",
+        "speciesname": "fuscus"
+    },
+    "87": {
+        "genusname": "Etelis",
+        "speciesname": "carbunculus"
+    },
+    "88": {
+        "genusname": "Lamna",
+        "speciesname": "nasus"
+    },
+    "89": {
+        "genusname": "Acanthocybium",
+        "speciesname": "solandri"
+    },
+    "90": {
+        "genusname": "Cetorhinus",
+        "speciesname": "maximus"
+    },
+    "91": {
+        "genusname": "Allothunnus",
+        "speciesname": "fallai"
+    },
+    "92": {
+        "genusname": "Acanthostracion",
+        "speciesname": "quadricornis"
+    },
+    "93": {
+        "genusname": "Auxis",
+        "speciesname": "rochei"
+    },
+    "94": {
+        "genusname": "Auxis",
+        "speciesname": "thazard"
+    },
+    "95": {
+        "genusname": "Cybiosarda",
+        "speciesname": "elegans"
+    },
+    "96": {
+        "genusname": "Euthynnus",
+        "speciesname": "affinis"
+    },
+    "97": {
+        "genusname": "Euthynnus",
+        "speciesname": "alletteratus"
+    },
+    "98": {
+        "genusname": "Euthynnus",
+        "speciesname": "lineatus"
+    },
+    "99": {
+        "genusname": "Alepisaurus",
+        "speciesname": "ferox"
+    },
+    "max_id": 99,
+    "min_id": 0
+}

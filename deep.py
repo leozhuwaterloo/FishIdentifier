@@ -36,9 +36,8 @@ class NeutralNetwork(object):
 
         h_conv2 = self.deep_nn_layer(h_pool1, [5, 5, 16, 32], [32], tf.nn.relu, conv2d)
         h_pool2 = max_pool_2x2(h_conv2)
-        h_pool2_drop = tf.nn.dropout(h_pool2, self.keep_prob)
 
-        h_conv3 = self.deep_nn_layer(h_pool2_drop, [5, 5, 32, 64], [64], tf.nn.relu, conv2d)
+        h_conv3 = self.deep_nn_layer(h_pool2, [5, 5, 32, 64], [64], tf.nn.relu, conv2d)
         h_pool3 = max_pool_2x2(h_conv3)
 
         h_pool3_flat = tf.reshape(h_pool3, [-1, 12 * 8 * 64])
@@ -68,8 +67,8 @@ class NeutralNetwork(object):
         biases = self.bias_variable(bias_dim)
         return act(handle(input_tensor, weights) + biases)
 
-    def train(self, training_image, training_label, attempt_n, batch_size, learning_rate, test_image, test_label):
-        train_step = tf.train.AdamOptimizer(learning_rate).minimize(self.cross_entropy)
+    def train(self, training_image, training_label, attempt_n, batch_size, test_image, test_label):
+        train_step = tf.train.AdamOptimizer().minimize(self.cross_entropy)
 
         sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -83,48 +82,50 @@ class NeutralNetwork(object):
                                                    feed_dict={self.x: test_image, self.y_: test_label,
                                                               self.keep_prob: 1.0})))
                 saver.save(sess, "Fish" + str(self.fish_group_id) + "/fish_conv.ckpt")
+
             sess.run(train_step,
                      feed_dict={self.x: batch_xs, self.y_: batch_ys, self.keep_prob: 0.5})
         sess.close()
 
-    def predict(self, path, test_img):
-        sess = tf.InteractiveSession()
-        saver = tf.train.Saver()
-        saver.restore(sess, path)
 
-        result = tf.argmax(self.y_conv, 1)
-        res = sess.run(result,
-                                      feed_dict={self.x: test_img, self.keep_prob: 1.0})
-        sess.close()
-        print(res[0])
-        return res[0]
+def convert(img_list):
+    converted = list()
+    print("Total " + str(len(img_list)))
+    for i, img in enumerate(img_list):
+        print(i)
+        img = np.asarray(img, dtype=np.int)
+        img = img.reshape([96*64*3, 1])
+        final_img = list()
+        for pixel in img:
+            alpha = pixel[0]
+            final_img.append((255.0 - alpha) / 255.0)
+        converted.append(final_img)
+    return converted
 
 
-def load_map(mapfile):
+def load_data(datafile, mapfile):
+
     with open(mapfile, 'r') as mfile:
         fish_map = json.load(mfile)
 
-    return fish_map
-
-def load_data(datafile, mapfile):
     with open(datafile, 'rb') as pfile:
         data= cPickle.load(pfile)
 
-    return data, load_map(mapfile)
+    print("Converting Train Images")
+    data[0] = convert(data[0])
+    print("Converting Test Images")
+    data[2] = convert(data[2])
+
+    return data, fish_map
 
 if __name__ == "__main__":
-    fish_group = 1
+    fish_group = 0
+    print("Loading Data")
     data, fish_map = load_data("data"+ str(fish_group) + ".p", "fishMap" + str(fish_group) + ".json")
-    
     max_id = fish_map["max_id"]
     min_id = fish_map["min_id"]
 
-    print(len(data[0]))
-    print(len(data[2]))
     print(min_id)
     print(max_id)
     nn = NeutralNetwork(max_id - min_id + 1, fish_group)
-    nn.train(data[0], data[1], 10000, 10, 1e-3, data[2], data[3])
-
-
-
+    nn.train(data[0], data[1], 100000, 10, data[2], data[3])

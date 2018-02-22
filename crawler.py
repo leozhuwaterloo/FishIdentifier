@@ -72,6 +72,8 @@ def craw(_):
         test_label_list[test_label-min_id] = 1
         final_test_labels.append(test_label_list)
 
+
+    print("Everything Completed Dumping")
     with open(data_file + str(FLAGS.group_index) + ".p" , 'wb') as datafile:
         cPickle.dump([images, final_labels, test_images, final_test_labels], datafile)
 
@@ -111,10 +113,10 @@ def get_fish(fish_id, FLAGS):
         while(len(_images) < FLAGS.image_count):
             google_img_list = google_image(genusname, speciesname, counter, FLAGS)
             counter += 10
-			for google_img_array in google_img_kist:
-				if google_img_array not in _images:
-					_images.append(google_img_array)
-					_labels.append(fish_id)
+            for google_img_array in google_img_list:
+                if google_img_array not in _images:
+                    _images.append(google_img_array)
+                    _labels.append(fish_id)
 
     if len(_images) > FLAGS.image_count - 5 and len(_images) > 5:
         return fish_id, genusname, speciesname, _images[5:], _labels[5:], _images[:5], _labels[:5]
@@ -135,13 +137,7 @@ def get_image(url):
     img = resize(img)
     img = img.convert('RGB')
     # img.save("test1.bmp")
-    img = np.asarray(img, dtype=np.int)
-    img = img.reshape([96*64*3, 1])
-    final_img = []
-    for pixel in img:
-        alpha = pixel[0]
-        final_img.append((255.0 - alpha) / 255.0)
-    return final_img
+    return img
 
 def google_image(genusname, speciesname, start, FLAGS):
     res = list()
@@ -188,7 +184,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--image_count',
         type=int,
-        default=30,
+        default=50,
         help='Minimum Image Count for Each Fish')
 
     parser.add_argument(

@@ -67,8 +67,11 @@ class NeutralNetwork(object):
         biases = self.bias_variable(bias_dim)
         return act(handle(input_tensor, weights) + biases)
 
-    def train(self, training_image, training_label, attempt_n, batch_size, test_image, test_label):
-        train_step = tf.train.AdamOptimizer().minimize(self.cross_entropy)
+    def train(self, training_image, training_label, attempt_n, batch_size, learning_rate, test_image, test_label):
+        if learning_rate is not None:
+            train_step = tf.train.AdamOptimizer(learning_rate).minimize(self.cross_entropy)
+        else:
+            train_step = tf.train.AdamOptimizer().minimize(self.cross_entropy)
 
         sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -83,6 +86,12 @@ class NeutralNetwork(object):
                                                               self.keep_prob: 1.0})))
                 saver.save(sess, "Fish" + str(self.fish_group_id) + "/fish_conv.ckpt")
 
+            if i % 1000 == 999:
+                test_batch_xs, test_batch_ys = next_batch(1000, training_image, training_label)
+                print("Train Step %d: %f" % (i, sess.run(self.accuracy,
+                                                   feed_dict={self.x: test_batch_xs, self.y_: test_batch_ys,
+                                                              self.keep_prob: 1.0})))
+
             sess.run(train_step,
                      feed_dict={self.x: batch_xs, self.y_: batch_ys, self.keep_prob: 0.5})
         sess.close()
@@ -90,9 +99,9 @@ class NeutralNetwork(object):
 
 def convert(img_list):
     converted = list()
-    print("Total " + str(len(img_list)))
+    total = len(img_list)
     for i, img in enumerate(img_list):
-        print(i)
+        print(str(i) + "/" + str(total))
         img = np.asarray(img, dtype=np.int)
         img = img.reshape([96*64*3, 1])
         final_img = list()
@@ -112,7 +121,8 @@ def load_data(datafile, mapfile):
         data= cPickle.load(pfile)
 
     print("Converting Train Images")
-    data[0] = convert(data[0])
+    data[0] = convert(data[0][:1000])
+    data[1] = data[1][:1000]
     print("Converting Test Images")
     data[2] = convert(data[2])
 
@@ -128,4 +138,4 @@ if __name__ == "__main__":
     print(min_id)
     print(max_id)
     nn = NeutralNetwork(max_id - min_id + 1, fish_group)
-    nn.train(data[0], data[1], 100000, 10, data[2], data[3])
+    nn.train(data[0], data[1], 100000, 10, None, data[2], data[3])

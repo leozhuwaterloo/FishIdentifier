@@ -13,8 +13,8 @@ def load_data(datafile, mapfile):
     return data, fish_map
 
 if __name__ == "__main__":
-    group = False
-    test = False
+    group = True
+    test = True
     if not group:
         print("Loading Data")
         data, fish_map = load_data("data0.p", "fishMap0.json")

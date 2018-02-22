@@ -170,7 +170,7 @@ if __name__ == "__main__":
     opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
     urllib.request.install_opener(opener)
     fish_map_file = "fishMap"
-    data_file = "data"
+    data_file = "rawdata"
     pool = Pool(processes=30)
     fish_map = dict()
     images = list()
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--image_count',
         type=int,
-        default=50,
+        default=60,
         help='Minimum Image Count for Each Fish')
 
     parser.add_argument(

@@ -1,6 +1,7 @@
 import urllib
 from http import cookiejar
 from urllib import request, parse
+from googleapiclient.errors import HttpError
 import re
 from multiprocessing import Pool
 from io import BytesIO
@@ -10,21 +11,24 @@ import _pickle as cPickle
 import numpy as np
 from googleapiclient.discovery import build
 import time
+import sys
+import argparse
+import tensorflow as tf
+
+FLAGS = None
 
 def get_min_size(size):
-    if size >= 0 and size<=99:
-        return 0
-    elif size >= 100 and size<=199:
-        return 100
+    for i in range(0, 10):
+        if size >= i*100 and size<=((i+1)*100)-1:
+            return i*100
 
 def get_max_size(size):
-    if size >= 0 and size<=99:
-        return 99
-    elif size >= 100 and size<=199:
-        return 199
+    for i in range(0, 10):
+        if size >= i*100 and size<=((i+1)*100)-1:
+            return ((i+1)*100)-1
 
-def craw(group_index):
-    multiple_results = [pool.apply_async(get_fish, [i]) for i in range(100*group_index, 100*(group_index+1))]
+def craw(_):
+    multiple_results = [pool.apply_async(get_fish, [i, FLAGS]) for i in range(100*FLAGS.group_index, 100*(FLAGS.group_index+1))]
     pool.close()
     pool.join()
 
@@ -53,7 +57,7 @@ def craw(group_index):
     fish_map["max_id"] = max_id
     fish_map["min_id"] = min_id
 
-    with open(fish_map_file + str(group_index) + ".json", 'w') as outfile:
+    with open(fish_map_file + str(FLAGS.group_index) + ".json", 'w') as outfile:
         json.dump(fish_map, outfile, indent=4)
 
     final_labels = []
@@ -68,11 +72,11 @@ def craw(group_index):
         test_label_list[test_label-min_id] = 1
         final_test_labels.append(test_label_list)
 
-    with open(data_file + str(group_index) + ".p" , 'wb') as datafile:
+    with open(data_file + str(FLAGS.group_index) + ".p" , 'wb') as datafile:
         cPickle.dump([images, final_labels, test_images, final_test_labels], datafile)
 
 
-def get_fish(fish_id):
+def get_fish(fish_id, FLAGS):
     genusname = None
     speciesname = None
     _images = list()
@@ -96,27 +100,39 @@ def get_fish(fish_id):
             img = img_res[0]
             img = img[11: img.find('alt')-3]
             print(img)
-            _images.append(get_image("http://www.fishbase.org/photos/" + str(img)))
-            _labels.append(fish_id)
+            image_array = get_image("http://www.fishbase.org/photos/" + str(img))
+            if image_array not in _images:
+                _images.append(image_array)
+                _labels.append(fish_id)
         else:
-            break	
+            break
     if genusname and speciesname:
         counter = 1
-        while(len(_images) < 50):
-            google_img_list = google_image(genusname, speciesname, counter)
+        while(len(_images) < FLAGS.image_count):
+            google_img_list = google_image(genusname, speciesname, counter, FLAGS)
             counter += 10
-            _images.extend(google_img_list)
-            _labels.extend([fish_id] * len(google_img_list))
-        
-    if len(_images) > 30:
+			for google_img_array in google_img_kist:
+				if google_img_array not in _images:
+					_images.append(google_img_array)
+					_labels.append(fish_id)
+
+    if len(_images) > FLAGS.image_count - 5 and len(_images) > 5:
         return fish_id, genusname, speciesname, _images[5:], _labels[5:], _images[:5], _labels[:5]
     else:
         return fish_id, genusname, speciesname, _images, _labels, list(), list()
 
+
+def resize(img):
+    img.thumbnail((96, 64))
+    width, height = img.size
+    new_img = Image.new("RGB", [96, 64], "white")
+    new_img.paste(img, (int((96 - width) / 2), int((64-height)/2)))
+    return new_img
+
 def get_image(url):
     fish_image_page = urllib.request.urlopen(url)
     img = Image.open(BytesIO(fish_image_page.read()))
-    img = img.resize((96, 64))
+    img = resize(img)
     img = img.convert('RGB')
     # img.save("test1.bmp")
     img = np.asarray(img, dtype=np.int)
@@ -127,30 +143,30 @@ def get_image(url):
         final_img.append((255.0 - alpha) / 255.0)
     return final_img
 
-def google_image(genusname, speciesname, start):
+def google_image(genusname, speciesname, start, FLAGS):
     res = list()
     print("Googling Image for: " + genusname+ " " + speciesname)
-    results = google_search(genusname+ " " + speciesname, "api_key", "cse_id", num=10, start = start)
-    
+    results = google_search(genusname+ " " + speciesname, FLAGS, num=10, start = start)
+
     for result in results:
         result_link = result['image']['thumbnailLink']
         print(result_link)
         res.append(get_image(result_link))
-    
+
     return res
 
-def google_search(search_term, api_key, cse_id, **kwargs):
+def google_search(search_term, FLAGS, **kwargs):
     try:
-        service = build("customsearch", "v1", developerKey=api_key)
-        res = service.cse().list(q=search_term, cx=cse_id, searchType='image', **kwargs).execute()
-        return res['items']    
+        service = build("customsearch", "v1", developerKey=FLAGS.api_key)
+        res = service.cse().list(q=search_term, cx=FLAGS.cse_id, searchType='image', **kwargs).execute()
+        return res['items']
     except HttpError as e:
         print(e)
         print("Sleeping for: " + search_term)
         time.sleep(100)
-        return google_search(search_term, api_key, cse_id, **kwargs)
+        return google_search(search_term, FLAGS, **kwargs)
 
-    
+
 
 
 if __name__ == "__main__":
@@ -166,4 +182,33 @@ if __name__ == "__main__":
     test_images = list()
     test_labels = list()
 
-    craw(1)
+
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--image_count',
+        type=int,
+        default=30,
+        help='Minimum Image Count for Each Fish')
+
+    parser.add_argument(
+        '--cse_id',
+        type=str,
+        default="000984312455375321060:bg4gtsmdaju",
+        help='Google Search Engine Id')
+
+    parser.add_argument(
+        '--api_key',
+        type=str,
+        default="AIzaSyBSj2yunMaOQq9mMzWyNEFa3lf8wBj7bCc",
+        help='Google Api Key')
+
+    parser.add_argument(
+        '--group_index',
+        type=str,
+        default=0,
+        help='Fish group index')
+
+    FLAGS, unparsed = parser.parse_known_args()
+
+    tf.app.run(main=craw, argv=[sys.argv[0]] + unparsed)

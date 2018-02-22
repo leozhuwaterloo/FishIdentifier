@@ -63,3 +63,8 @@ checkpoint
 *.tsv
 *.pbtxt
 *.zip
+
+
+*.bmp
+*.p
+fishIdentifier/*

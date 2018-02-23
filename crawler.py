@@ -112,13 +112,15 @@ def get_fish(fish_id, FLAGS):
         counter = 1
         while(len(_images) < FLAGS.image_count):
             google_img_list = google_image(genusname, speciesname, counter, FLAGS)
+            if google_img_list is None:
+                break
             counter += 10
             for google_img_array in google_img_list:
                 if google_img_array not in _images:
                     _images.append(google_img_array)
                     _labels.append(fish_id)
 
-    if len(_images) > FLAGS.image_count - 5 and len(_images) > 5:
+    if len(_images) > 5:
         return fish_id, genusname, speciesname, _images[5:], _labels[5:], _images[:5], _labels[:5]
     else:
         return fish_id, genusname, speciesname, _images, _labels, list(), list()
@@ -144,6 +146,9 @@ def google_image(genusname, speciesname, start, FLAGS):
     print("Googling Image for: " + genusname+ " " + speciesname)
     results = google_search(genusname+ " " + speciesname, FLAGS, num=10, start = start)
 
+    if results is None:
+        return None
+
     for result in results:
         result_link = result['image']['thumbnailLink']
         print(result_link)
@@ -158,9 +163,7 @@ def google_search(search_term, FLAGS, **kwargs):
         return res['items']
     except HttpError as e:
         print(e)
-        print("Sleeping for: " + search_term)
-        time.sleep(100)
-        return google_search(search_term, FLAGS, **kwargs)
+        return None
 
 
 
@@ -171,7 +174,7 @@ if __name__ == "__main__":
     urllib.request.install_opener(opener)
     fish_map_file = "fishMap"
     data_file = "rawdata"
-    pool = Pool(processes=30)
+    pool = Pool(processes=40)
     fish_map = dict()
     images = list()
     labels = list()
@@ -184,7 +187,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--image_count',
         type=int,
-        default=60,
+        default=200,
         help='Minimum Image Count for Each Fish')
 
     parser.add_argument(

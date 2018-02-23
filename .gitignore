@@ -68,3 +68,5 @@ checkpoint
 *.p
 fishIdentifier/*
 Test/*
+FishTestImage/*
+FishTrainImage/*

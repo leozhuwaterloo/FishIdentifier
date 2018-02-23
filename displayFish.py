@@ -14,19 +14,20 @@ def load_data(datafile, mapfile):
 
 if __name__ == "__main__":
     group = True
-    test = True
+    test = False
     if not group:
         print("Loading Data")
-        data, fish_map = load_data("data0.p", "fishMap0.json")
+        data, fish_map = load_data("rawdata0.p", "fishMap0.json")
         for i in range(0, 100):
             print(i)
             data[2][i*3].save("FishImageTest/test" + str(i) + ".png")
     else:
         print("Loading Data")
         index = 2 if test else 0
-        data, fish_map = load_data("data0.p", "fishMap0.json")
+        data, fish_map = load_data("rawdata0.p", "fishMap0.json")
         start = 0
         max_count = len(data[index])
+        print(max_count)
         size = int(math.ceil(math.sqrt(max_count)))
         img = Image.new("RGB", [96*size, 64*size], "white")
 

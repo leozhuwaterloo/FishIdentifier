@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import argparse
 import os
+from crawler import resize
 
 def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
@@ -13,15 +14,6 @@ def conv2d(x, W):
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
-
-def next_batch(num, images, labels):
-    idx = np.arange(0 , len(images))
-    np.random.shuffle(idx)
-    idx = idx[:num]
-    image_shuffle = [images[i] for i in idx]
-    labels_shuffle = [labels[i] for i in idx]
-
-    return np.asarray(image_shuffle), np.asarray(labels_shuffle)
 
 
 class NeutralNetwork(object):
@@ -50,13 +42,6 @@ class NeutralNetwork(object):
 
         self.y_conv = self.deep_nn_layer(h_fc_drop, [512, id_count], [id_count], tf.identity, tf.matmul)
 
-        self.cross_entropy = tf.reduce_mean(
-            tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.y_, logits=self.y_conv))
-
-
-        correct_prediction = tf.equal(tf.argmax(self.y_conv, 1), tf.argmax(self.y_, 1))
-        self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
     def weight_variable(self, shape):
         initial = tf.truncated_normal(shape, stddev=0.1)
         return tf.Variable(initial)
@@ -69,25 +54,6 @@ class NeutralNetwork(object):
         weights = self.weight_variable(weight_dim)
         biases = self.bias_variable(bias_dim)
         return act(handle(input_tensor, weights) + biases)
-
-    def train(self, training_image, training_label, attempt_n, batch_size, learning_rate, test_image, test_label):
-        train_step = tf.train.AdamOptimizer(learning_rate).minimize(self.cross_entropy)
-
-        sess = tf.InteractiveSession()
-        tf.global_variables_initializer().run()
-        saver = tf.train.Saver()
-        saver.restore(sess, "Fish" + str(self.fish_group_id) + "/fish_conv.ckpt")
-
-        for i in range(attempt_n):
-            batch_xs, batch_ys = next_batch(batch_size, training_image, training_label)
-            if i % 100 == 99:
-                print("Step %d: %f" % (i, sess.run(self.accuracy,
-                                                   feed_dict={self.x: test_image, self.y_: test_label,
-                                                              self.keep_prob: 1.0})))
-                saver.save(sess, "Fish" + str(self.fish_group_id) + "/fish_conv.ckpt")
-            sess.run(train_step,
-                     feed_dict={self.x: batch_xs, self.y_: batch_ys, self.keep_prob: 0.5})
-        sess.close()
 
     def predict(self, path, test_img):
         sess = tf.InteractiveSession()
@@ -107,8 +73,6 @@ def load_map(mapfile):
 
     return fish_map
 
-
-
 def load_data(datafile):
     with open(datafile, 'rb') as pfile:
         data= cPickle.load(pfile)
@@ -118,19 +82,6 @@ def get_id(id_list):
     for i, val in enumerate(id_list):
         if val == 1:
             return i
-
-def put_image(img_list, img, start_xc, start_yc):
-    xc = start_xc
-    yc = start_yc
-    for i in range(0, len(img_list), 3):
-        r = int(255.0 - img_list[i] * 255.0)
-        g = int(255.0 - img_list[i+1] * 255.0)
-        b = int(255.0 - img_list[i+2] * 255.0)
-        img.putpixel((xc, yc), (r,g,b))
-        xc += 1
-        if xc > 95 + start_xc:
-            xc = start_xc
-            yc += 1
 
 
 if __name__ == "__main__":
@@ -150,7 +101,7 @@ if __name__ == "__main__":
     fish_group = 0
     if args.img_dir is not None:
         with Image.open(args.img_dir) as img:
-            img = img.resize((96, 64))
+            img = resize(img)
             img = img.convert('RGB')
 
             img = np.asarray(img, dtype=np.int)
@@ -165,25 +116,22 @@ if __name__ == "__main__":
             min_id = fish_map["min_id"]
             nn = NeutralNetwork(max_id - min_id + 1, fish_group)
             fish_id_predict = nn.predict("Fish" + str(fish_group) + "/fish_conv.ckpt", [final_img])
-            fish_info = fish_map.get(str(min_id + fish_id_predict), None)            
-            print(fish_id_predict)            
+            fish_info = fish_map.get(str(min_id + fish_id_predict), None)
+            print(fish_id_predict)
             print(fish_info)
-            
+
             if args.display is not None and fish_info is not None:
-                data = load_data("data" + str(fish_group) + ".p")
+                data = load_data("rawdata" + str(fish_group) + ".p")
                 size = 5
                 img = Image.new("RGB", [96*size, 64*size], "white")
-                
+
                 counter = 0
                 for i in range(0, len(data[1])):
                     if(get_id(data[1][i]) == fish_id_predict):
-                        put_image(data[0][i], img, 96*int(counter/size), 64*int(counter%size))
+                        img.paste(data[0][i], (96*int(counter/size), 64*int(counter%size)))
                         counter+=1
                         if(counter >= size * size): break
 
-                img.show()
+                img.save("test.bmp")
     else:
         print("Please Specify image directory with --img_dir")
-
-
-

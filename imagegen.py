@@ -35,21 +35,28 @@ if __name__ == "__main__":
         x = x.reshape((1,) + x.shape)
         print(n)
         i = 0
-        new_img_list = list()
         for batch in datagen.flow(x, batch_size=1):
             batch = batch.reshape((64,96,3))
             batch = array_to_img(batch)
-            if batch not in new_img_list:
-                new_train_image.append(batch)
-                new_train_label.append(data[1][n])
-                i += 1
+            new_train_image.append(batch)
+            new_train_label.append(data[1][n])
+            i += 1
             if i > 10:
                 break
-
 
     data[0].extend(new_train_image)
     data[1].extend(new_train_label)
 
+    print("Saving Train Image")
+    for n in range (0, len(data[0])):
+        print(n)
+        data[0][n].save("FishTrainImage/" + str(n) + ".jpg")
+
+    print("Saving Test Image")
+    for n in range (0, len(data[2])):
+        print(n)
+        data[2][n].save("FishTestImage/" + str(n) + ".jpg")
+
     print("Everything Completed Dumping")
     with open("data0.p" , 'wb') as datafile:
-        cPickle.dump([new_train_image, new_train_label, data[2], data[3]], datafile)
+        cPickle.dump(data, datafile)

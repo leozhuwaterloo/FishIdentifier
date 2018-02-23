@@ -3,6 +3,7 @@ import tensorflow as tf
 import json
 import numpy as np
 from PIL import Image
+from keras.preprocessing.image import img_to_array, array_to_img
 
 def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
@@ -12,14 +13,30 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
 
+
+
+def get_from_directory(img_dir, idx):
+    indexed_image_list = list()
+    for i in idx:
+        with Image.open(img_dir + str(i) + ".jpg") as im:
+            indexed_image_list.append(array_to_img(img_to_array(im)))
+
+    return convert(indexed_image_list, no_print=True)
+
+
+
 def next_batch(num, images, labels):
-    idx = np.arange(0 , len(images))
+    idx = np.arange(0 , len(labels))
     np.random.shuffle(idx)
     idx = idx[:num]
-    image_shuffle = [images[i] for i in idx]
     labels_shuffle = [labels[i] for i in idx]
+    if isinstance(images, list):
+        image_shuffle = [images[i] for i in idx]
+    else:
+        image_shuffle = get_from_directory(images, idx)
 
     return np.asarray(image_shuffle), np.asarray(labels_shuffle)
+
 
 
 class NeutralNetwork(object):
@@ -80,14 +97,15 @@ class NeutralNetwork(object):
 
         for i in range(attempt_n):
             batch_xs, batch_ys = next_batch(batch_size, training_image, training_label)
-            if i % 100 == 99:
+            print(i % 100, end=' ', flush=True)
+            if i % 100 == 0:
                 print("Step %d: %f" % (i, sess.run(self.accuracy,
                                                    feed_dict={self.x: test_image, self.y_: test_label,
                                                               self.keep_prob: 1.0})))
                 saver.save(sess, "Fish" + str(self.fish_group_id) + "/fish_conv.ckpt")
 
             if i % 1000 == 999:
-                test_batch_xs, test_batch_ys = next_batch(1000, training_image, training_label)
+                test_batch_xs, test_batch_ys = next_batch(100, training_image, training_label)
                 print("Train Step %d: %f" % (i, sess.run(self.accuracy,
                                                    feed_dict={self.x: test_batch_xs, self.y_: test_batch_ys,
                                                               self.keep_prob: 1.0})))
@@ -97,12 +115,13 @@ class NeutralNetwork(object):
         sess.close()
 
 
-def convert(img_list):
+def convert(img_list, no_print = False):
     converted = list()
     total = len(img_list)
     for i, img in enumerate(img_list):
-        print(str(i) + "/" + str(total))
-        img = np.asarray(img, dtype=np.int)
+        if not no_print:
+            print(str(i) + "/" + str(total))
+        img = img_to_array(img)
         img = img.reshape([96*64*3, 1])
         final_img = list()
         for pixel in img:
@@ -112,7 +131,7 @@ def convert(img_list):
     return converted
 
 
-def load_data(datafile, mapfile):
+def load_data(datafile, mapfile, from_directory):
 
     with open(mapfile, 'r') as mfile:
         fish_map = json.load(mfile)
@@ -120,9 +139,9 @@ def load_data(datafile, mapfile):
     with open(datafile, 'rb') as pfile:
         data= cPickle.load(pfile)
 
-    print("Converting Train Images")
-    data[0] = convert(data[0][:1000])
-    data[1] = data[1][:1000]
+    if not from_directory:
+        print("Converting Train Images")
+        data[0] = convert(data[0])
     print("Converting Test Images")
     data[2] = convert(data[2])
 
@@ -130,12 +149,17 @@ def load_data(datafile, mapfile):
 
 if __name__ == "__main__":
     fish_group = 0
+    from_directory = False
     print("Loading Data")
-    data, fish_map = load_data("data"+ str(fish_group) + ".p", "fishMap" + str(fish_group) + ".json")
+    data, fish_map = load_data("rawdata"+ str(fish_group) + ".p", "fishMap" + str(fish_group) + ".json", from_directory)
     max_id = fish_map["max_id"]
     min_id = fish_map["min_id"]
+    batch_size = 10
 
     print(min_id)
     print(max_id)
     nn = NeutralNetwork(max_id - min_id + 1, fish_group)
-    nn.train(data[0], data[1], 100000, 10, None, data[2], data[3])
+    if from_directory:
+        nn.train("FishTrainImage/", data[1], 100000, batch_size, None, data[2], data[3])
+    else:
+        nn.train(data[0], data[1], 100000, batch_size, None, data[2], data[3])

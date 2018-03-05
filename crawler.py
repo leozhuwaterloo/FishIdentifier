@@ -193,13 +193,13 @@ if __name__ == "__main__":
     parser.add_argument(
         '--cse_id',
         type=str,
-        default="000984312455375321060:bg4gtsmdaju",
+        default="your-search-engine-id",
         help='Google Search Engine Id')
 
     parser.add_argument(
         '--api_key',
         type=str,
-        default="AIzaSyBSj2yunMaOQq9mMzWyNEFa3lf8wBj7bCc",
+        default="your-api-key",
         help='Google Api Key')
 
     parser.add_argument(
